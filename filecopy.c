@@ -30,7 +30,6 @@ int main(int argc, char *argv[]) {
 	char *cpyPath = argv[2];
 
 	int inFile = open(inPath, O_RDONLY, 0);
-	int cpyFile = open(cpyPath, O_CREAT | O_WRONLY, 0666);
 
 	if(inFile == -1){
 		fprintf(stderr, "\n\nERROR: Opening input file failed.");
