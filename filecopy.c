@@ -11,8 +11,9 @@
 #include <unistd.h>
 
 int main(int argc, char *argv[]) {
-
-	//TODO: add usage error
+	if (argc != 3){
+		fprintf(stderr, "Format error; usage: filecopy <input_file_name> <output_file_name>\n");
+	}
 
 	//Variables
 	int fd[2];		//Stores file descriptors
@@ -31,8 +32,18 @@ int main(int argc, char *argv[]) {
 	int inFile = open(inPath, O_RDONLY, 0);
 	int cpyFile = open(cpyPath, O_CREAT | O_WRONLY, 0666);
 
-	//TODO: Add error handling for file opening
-	
+	if(inFile == -1){
+		fprintf(stderr, "\n\nERROR: Opening input file failed.");
+		exit(1);
+	}
+
+	int cpyFile = open(cpyPath, O_CREAT | O_WRONLY, 0666);
+
+	if(cpyFile == -1){
+		fprintf(stderr, "\n\nERROR: Opening output file failed.");
+		exit(1);
+	}
+
 	//Fork the child (hehehehehe...)
 	chID = fork();
 
