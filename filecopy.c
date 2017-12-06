@@ -21,6 +21,7 @@ int main(int argc, char *argv[]) {
 	int len;
 	char buff[1024];
 	int readNum;
+	int err;
 
 	//Make pipe
 	pipe(fd);
@@ -32,14 +33,14 @@ int main(int argc, char *argv[]) {
 	int inFile = open(inPath, O_RDONLY, 0);
 
 	if(inFile == -1){
-		fprintf(stderr, "\n\nERROR: Opening input file failed.");
+		perror("\n\nFATAL ERROR: ");
 		exit(1);
 	}
 
 	int cpyFile = open(cpyPath, O_CREAT | O_WRONLY, 0666);
 
 	if(cpyFile == -1){
-		fprintf(stderr, "\n\nERROR: Opening output file failed.");
+		perror("\n\nFATAL ERROR: ");
 		exit(1);
 	}
 
@@ -50,18 +51,39 @@ int main(int argc, char *argv[]) {
 	if(chID == 0){
 		
 		//Close output end of pipe while file is being read
-		close(fd[1]);
+		err = close(fd[1]);
+
+		if(err == (-1)){
+			perror("\n\nFATAL ERROR: ");
+			exit(1);
+		}
 
 		//Read file		
-		read(fd[0], buff, sizeof(buff));
+		err = read(fd[0], buff, sizeof(buff));
+
+		if(err == (-1)){
+			perror("\n\nFATAL ERROR: ");
+			exit(1);
+		}
 
 		//Writing to file
-		write(cpyFile, buff, strlen(buff));
-	}	
+		err = write(cpyFile, buff, strlen(buff));
+
+		if(err == (-1)){
+			perror("\n\nFATAL ERROR: ");
+			exit(1);
+		}
+	}
+
 	//Parent process
 	else{
 		//Close input side of pipe
-		close(fd[0]);
+		err = close(fd[0]);
+
+		if(err == (-1)){
+			perror("\n\nFATAL ERROR: ");
+			exit(1);
+		}
 
 		//Read from file
 		while((readNum = read(inFile,buff, sizeof(buff)) > 0)){
@@ -69,7 +91,13 @@ int main(int argc, char *argv[]) {
 		}
 
 		//Close pipe output & exit
-		close(fd[1]);
+		err = close(fd[1]);
+
+		if(err == (-1)){
+			perror("\n\nFATAL ERROR: ");
+			exit(1);
+		}
+
 		exit(0);
 	}
 }
